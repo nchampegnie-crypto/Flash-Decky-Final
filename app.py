@@ -98,6 +98,9 @@ with tabs[1]:
             if st.button("Use selected columns", type="primary"):
                 cards_df = df_preview[[front_col, back_col]].copy()
                 cards_df.columns = ["Front", "Back"]
+                cards_df = cards_df.fillna("")
+                cards_df["Front"] = cards_df["Front"].astype(str)
+                cards_df["Back"] = cards_df["Back"].astype(str)
                 st.session_state.cards = cards_df
                 st.success(f"Upload complete. Loaded {len(cards_df)} cards from table.")
         else:
@@ -126,10 +129,17 @@ with tabs[2]:
             st.session_state.cards = df
             for w in warnings:
                 st.warning(w)
-            st.success(f"Upload complete. Parsed {len[df]} cards.")
+            st.success(f"Upload complete. Parsed {len(df)} cards.")
 
 st.markdown("### 2) Review & Edit")
 cards = st.session_state.cards.copy()
+# Ensure text dtypes to satisfy TextColumn config
+if not cards.empty:
+    cards = cards.fillna("")
+    if 'Front' in cards.columns:
+        cards['Front'] = cards['Front'].astype(str)
+    if 'Back' in cards.columns:
+        cards['Back'] = cards['Back'].astype(str)
 edited = st.data_editor(
     cards,
     use_container_width=True,

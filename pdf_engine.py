@@ -90,7 +90,6 @@ def _draw_card_footer(c: canvas.Canvas, x, y, w, text: str):
     if not text:
         return
     c.setFont(FOOTER_FONT, 8)
-    from reportlab.pdfbase import pdfmetrics
     tw = pdfmetrics.stringWidth(text, FOOTER_FONT, 8)
     c.drawString(x + w - tw - 6, y + 4, text)
 
@@ -112,7 +111,7 @@ def build_flashcards_pdf(
 
     cards = list(df.itertuples(index=False, name=None))
     total = len(cards)
-    sheets = math.ceil(total / (COLS*ROWS))
+    sheets = (total + (COLS*ROWS - 1)) // (COLS*ROWS)
 
     card_idx = 0
     for s in range(sheets):
@@ -137,7 +136,6 @@ def build_flashcards_pdf(
         if duplex_mode.startswith("Short-edge"):
             c.translate(PAGE_W, PAGE_H)
             c.rotate(180)
-        from utils import mm_to_pt
         c.translate(mm_to_pt(offset_x_mm), mm_to_pt(offset_y_mm))
 
         _draw_cut_lines(c)
